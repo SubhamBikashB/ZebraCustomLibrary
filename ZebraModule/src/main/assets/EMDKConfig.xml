@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?><!--This is an auto generated document. Changes to this document may cause incorrect behavior.--><wap-provisioningdoc>
+  <characteristic type="ProfileInfo">
+    <parm name="created_wizard_version" value="11.0.2"/>
+  </characteristic>
+  <characteristic type="Profile">
+    <parm name="ProfileName" value="andriod test"/>
+    <parm name="ModifiedDate" value="2023-07-12 20:27:47"/>
+    <parm name="TargetSystemVersion" value="10.1"/>
+      
+    <characteristic type="ActivitySelection" version="0.1">
+      <parm name="emdk_name" value="BarScannerSample"/>
+      <characteristic type="Application">
+        <parm name="PrefixAppName" value="true"/>
+        <parm name="package" value="Sample"/>
+        <characteristic type="Activities">
+          <parm name="activity" value="Sample"/>
+        </characteristic>
+      </characteristic>
+    </characteristic>
+    <characteristic type="CameraMgr" version="6.0">
+      <parm name="emdk_name" value="sss"/>
+    </characteristic>
+  </characteristic>
+  <characteristic type="Profile">
+    <parm name="ProfileName" value="sample"/>
+    <parm name="ModifiedDate" value="2023-06-28 23:17:51"/>
+    <parm name="TargetSystemVersion" value="11.6"/>
+    <characteristic type="CameraMgr" version="6.0">
+      <parm name="emdk_name" value="sample_cam"/>
+    </characteristic>
+    <characteristic type="UsbMgr" version="11.6">
+      <parm name="emdk_name" value="usb"/>
+    </characteristic>
+  </characteristic>
+</wap-provisioningdoc>
