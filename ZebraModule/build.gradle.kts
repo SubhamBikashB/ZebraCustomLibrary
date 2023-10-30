@@ -58,9 +58,9 @@ dependencies {
 publishing {
     publications {
         register<MavenPublication>("release") {
-            groupId = "zebra-scanner-android-lib"
-            artifactId = "zebra-scanner-android-lib"
-            version = "1.0.0"
+            groupId = "com.github.SubhamBikashB"
+            artifactId = "ZebraCustomLibrary"
+            version = "1.1.0"
             afterEvaluate {
                 from(components["release"])
             }
