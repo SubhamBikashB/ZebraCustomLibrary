@@ -1,7 +1,6 @@
 package com.techolution.zebramodule.implementation
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.symbol.emdk.EMDKManager
 import com.symbol.emdk.EMDKResults
@@ -16,12 +15,15 @@ import com.symbol.emdk.barcode.StatusData
 
 object ZebraFeaturesImpl : EMDKManager.EMDKListener, Scanner.DataListener, Scanner.StatusListener, BarcodeManager.ScannerConnectionListener {
 
-    private var recieverMessage :MutableLiveData<String> = MutableLiveData()
+
+    private var recieverMessage:MutableLiveData<Event<ResponseModel>> = MutableLiveData()
+
     private var deviceList = arrayListOf<ScannerInfo>()
     private var defaultScannerIndex = 0 // Keep the selected scanner
     private var updatedScannerIndex = 0 // After changing the scanner Index
     private var scanData:ScanDataCollection.ScanData ? = null
 
+    private var triggerEnabled = false
     private var bSoftTriggerSelected = false
     private var bExtScannerDisconnected = false
 
@@ -48,26 +50,29 @@ object ZebraFeaturesImpl : EMDKManager.EMDKListener, Scanner.DataListener, Scann
        return scanData
    }
 
-    fun startScanBarCode(callBack: ((MutableLiveData<String>) -> Unit)?=null){
-        cancelRead()
-        setEnableButtonTrigger()
+    fun startScanBarCode(callBack: ((MutableLiveData<Event<ResponseModel>>) -> Unit)?=null){
+        recieverMessage.postValue(null)
         callBack?.invoke(recieverMessage)
     }
 
-    private fun setEnableButtonTrigger(){
-        // submit read
-        if (!scanner?.isReadPending!! && !bExtScannerDisconnected) {
-            try {
-                scanner?.read()
-            } catch (e: ScannerException) {
-                e.printStackTrace()
-            }
-        }
-    }
+     fun setEnableButtonTrigger(){
+         if (scanner!=null){
+             if (!scanner?.isReadPending!! && !bExtScannerDisconnected) {
+                 try {
+                     cancelRead()
+                     triggerEnabled = true
+                     scanner?.read()
+                 } catch (e: ScannerException) {
+                     e.printStackTrace()
+                 }
+             }
+         }
+     } 
 
      fun disableButtonTrigger(){
         try {
             scanner?.cancelRead()
+            triggerEnabled = false
         } catch (e: ScannerException) {
             e.printStackTrace()
         }
@@ -130,8 +135,7 @@ object ZebraFeaturesImpl : EMDKManager.EMDKListener, Scanner.DataListener, Scann
         if (p0 != null && p0.result == ScannerResults.SUCCESS) {
             scanData = null
             scanData = p0.scanData.last()
-            recieverMessage.postValue("scanDone")
-            Log.d("getData", "onData: ${scanData?.data}")
+            responseMaker(200,"ScanDone", scanData?.data.toString())
         }
     }
 
@@ -145,24 +149,35 @@ object ZebraFeaturesImpl : EMDKManager.EMDKListener, Scanner.DataListener, Scann
                 }else{
                     scanner?.triggerType = Scanner.TriggerType.HARD
                 }
+                // submit read
+                if (!scanner?.isReadPending!! && !bExtScannerDisconnected) {
+                    try {
+                        if (triggerEnabled){
+                            scanner?.read()
+                        }else{
+                            scanner?.cancelRead()
+                        }
+                    } catch (e: Exception) {
+                        responseMaker(300,e.message.toString(),"")
+                    }
+                }
             }
 
             StatusData.ScannerStates.WAITING -> {
-                recieverMessage.postValue("Scanner is waiting for trigger press...")
+                responseMaker(300,"Scanner is waiting for trigger press...","")
             }
 
             StatusData.ScannerStates.SCANNING -> {
-                recieverMessage.postValue("Scanning...")
+                responseMaker(300,"Scanning...","")
             }
 
             StatusData.ScannerStates.DISABLED -> {
-                recieverMessage.postValue(p0.friendlyName + " is disabled.")
+                responseMaker(400,p0.friendlyName + " is disabled.","")
             }
 
             StatusData.ScannerStates.ERROR -> {
-                recieverMessage.postValue("An error has occurred.")
+                responseMaker(400,"An error has occurred.","")
             }
-
             else -> {}
         }
     }
@@ -277,7 +292,11 @@ object ZebraFeaturesImpl : EMDKManager.EMDKListener, Scanner.DataListener, Scann
             }
         }
     }
-
-
-
+    private fun responseMaker(status:Int,message:String,data:String){
+    recieverMessage.postValue(Event(ResponseModel(status, message, data)))
+    }
+    fun softScan(){
+        bSoftTriggerSelected = true
+        cancelRead()
+    }
 }

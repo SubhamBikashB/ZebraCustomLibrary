@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.techolution.zebracustomlibrary"
-        minSdk = 24
+        minSdk = 28
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
@@ -37,6 +37,8 @@ android {
 
 dependencies {
     implementation(project(mapOf("path" to ":ZebraModule")))
+
+  //  implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.8.0")
@@ -45,5 +47,5 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
-   // implementation ("com.github.SubhamBikashB:ZebraCustomLibrary:1.0.0")
+    //implementation("com.github.SubhamBikashB:ZebraCustomLibrary:1.1.0")
 }
